@@ -2,6 +2,7 @@ import React from 'react';
 import { Box } from '@material-ui/core';
 import { BadgeAvatar, ChatContent } from '../Sidebar';
 import { makeStyles } from '@material-ui/core/styles';
+import UnreadBubble from './UnreadBubble';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,6 +35,7 @@ const Chat = ({ conversation, setActiveChat }) => {
         sidebar={true}
       />
       <ChatContent conversation={conversation} />
+      <UnreadBubble unreadMessages={conversation.unreadMessages}/>
     </Box>
   );
 };
