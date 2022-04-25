@@ -70,7 +70,6 @@ const Home = ({ user, logout }) => {
       } else {
         addMessageToConversation(data);
       }
-
       sendMessage(data, body);
     } catch (error) {
       console.error(error);
@@ -80,15 +79,22 @@ const Home = ({ user, logout }) => {
   const addNewConvo = useCallback(
     (recipientId, message) => {
       let newConversations = [...conversations];
+      let newestChatIndex;
 
-      newConversations.forEach((convo) => {
+      newConversations.forEach((convo, index) => {
         if (convo.otherUser.id === recipientId) {
-          convo.messages.push(message);
+          newestChatIndex = index;
+          const messagesCopy = [...convo.messages, message];
+          convo.messages = [...messagesCopy];
           convo.latestMessageText = message.text;
           convo.id = message.conversationId;
         }
       });
-      setConversations(() => [...newConversations]);
+
+      const firstChat = newConversations[newestChatIndex];
+      newConversations.splice(newestChatIndex, 1)
+      
+      setConversations(() => [firstChat, ...newConversations]);
     },
     [setConversations, conversations]
   );
@@ -108,14 +114,21 @@ const Home = ({ user, logout }) => {
       }
 
       let newConversations = [...conversations];
-      newConversations.forEach((convo) => {
+      let newestChatIndex;
+
+      newConversations.forEach((convo, index) => {
         if (convo.id === message.conversationId) {
-          convo.messages.push(message);
+          newestChatIndex = index;
+          const messagesCopy = [...convo.messages, message];
+          convo.messages = [...messagesCopy];
           convo.latestMessageText = message.text;
         }
       });
 
-      setConversations(() => [...newConversations]);
+      const firstChat = newConversations[newestChatIndex];
+      newConversations.splice(newestChatIndex, 1)
+      
+      setConversations(() => [firstChat, ...newConversations]);
     },
     [setConversations, conversations]
   );
