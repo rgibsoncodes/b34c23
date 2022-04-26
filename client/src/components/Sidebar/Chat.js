@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import { Box } from '@material-ui/core';
 import { BadgeAvatar, ChatContent } from '../Sidebar';
 import { makeStyles } from '@material-ui/core/styles';
@@ -18,12 +18,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Chat = ({ conversation, setActiveChat }) => {
+const Chat = ({ conversation, setActiveChat, setMessagesToRead }) => {
   const classes = useStyles();
   const { otherUser } = conversation;
 
+  const unreadMessages = useMemo(() => {
+    return conversation.messages.filter(message => !message.read).length; 
+  }, [conversation])
+
   const handleClick = async (conversation) => {
     await setActiveChat(conversation.otherUser.username);
+    if (unreadMessages > 0) {
+        setMessagesToRead(conversation.id);
+    }
   };
 
   return (
@@ -35,7 +42,7 @@ const Chat = ({ conversation, setActiveChat }) => {
         sidebar={true}
       />
       <ChatContent conversation={conversation} />
-      <UnreadBubble unreadMessages={conversation.unreadMessages}/>
+      <UnreadBubble unreadMessages={unreadMessages}/>
     </Box>
   );
 };

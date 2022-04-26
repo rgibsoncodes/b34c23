@@ -21,10 +21,12 @@ const UnreadBubble = (props) => {
     const classes = useStyles();
     const { unreadMessages = 0 } = props;
 
-    return (
-      <div className={classes.unreadBubble}>
+    return ( unreadMessages !== 0  &&
+      (
+        <div className={classes.unreadBubble}>
           <p className={classes.unreadBubbleText}>{unreadMessages}</p>
-      </div>
+        </div>
+      )
     );
 };
 

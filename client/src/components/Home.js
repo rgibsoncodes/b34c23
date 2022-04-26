@@ -149,6 +149,34 @@ const Home = ({ user, logout }) => {
     );
   }, []);
 
+  const setMessagesToRead = useCallback((id) => {
+    try {
+      const body = {
+        conversationId: id,
+        readMessages: true,
+      }
+      saveMessage(body);
+      setConversations((prev) =>
+        prev.map((convo) => {
+          if (convo.id === id) {
+            const convoCopy = { ...convo };
+            const updatedMessages = [...convoCopy.messages]
+            updatedMessages.forEach(message => {
+                message.read = true;
+            });
+            convoCopy.messages = [...updatedMessages];
+            return convoCopy;
+          } else {
+            return convo;
+          }
+        })
+      );
+
+    } catch (error) {
+      console.error(error);
+    }
+  }, [setConversations])
+
   // Lifecycle
 
   useEffect(() => {
@@ -210,6 +238,7 @@ const Home = ({ user, logout }) => {
           clearSearchedUsers={clearSearchedUsers}
           addSearchedUsers={addSearchedUsers}
           setActiveChat={setActiveChat}
+          setMessagesToRead={setMessagesToRead}
         />
         <ActiveChat
           activeConversation={activeConversation}
