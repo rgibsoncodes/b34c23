@@ -22,7 +22,7 @@ const Chat = ({ conversation, setActiveChat, setMessagesToRead, user }) => {
   const classes = useStyles();
   const { otherUser } = conversation;
 
-  console.log(conversation)
+  // Calculates the amount of unread messages by either hitting a true value or the other users message.
   const unreadMessages = useMemo(() => {
     for (let i = conversation.messages.length - 1; i >= 0; i--) {
         if (conversation.messages[i].read === true || conversation.messages[i].senderId === user.id) {

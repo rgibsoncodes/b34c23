@@ -165,6 +165,7 @@ const Home = ({ user, logout }) => {
     );
   }, []);
 
+  // Function hits backend to update messages in database and immediately updates front-end. 
   const setMessagesToRead = useCallback((updateMessageObject) => {
     const { unreadMessages, conversationId } = updateMessageObject;
     const messagesArray = [];
@@ -175,11 +176,12 @@ const Home = ({ user, logout }) => {
             const convoCopy = { ...convo };
             const updatedMessages = [...convoCopy.messages]
             const startIndex = updatedMessages.length - unreadMessages;
-            console.log(updatedMessages, startIndex)
+
             for (let i = startIndex; i < updatedMessages.length; i++) {
                 updatedMessages[i].read = true;
                 messagesArray.push(updatedMessages[i].id);
             }
+
             convoCopy.messages = [...updatedMessages];
             return convoCopy;
           } else {

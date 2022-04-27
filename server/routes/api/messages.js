@@ -3,15 +3,16 @@ const { Conversation, Message } = require("../../db/models");
 const onlineUsers = require("../../onlineUsers");
 
 
+// Async function to upadte read value of message.
 const handleMessage = async (messageId) => {
   try {
-    let databaseMessage = await Message.findMessage(messageId);
+    const databaseMessage = await Message.findMessage(messageId);
     databaseMessage.set({
         read: true,
     })
     await databaseMessage.save();
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -23,7 +24,8 @@ router.post("/", async (req, res, next) => {
     }
     const senderId = req.user.id;
     const { recipientId, text, conversationId, sender, readMessages } = req.body;
-    
+
+    // checks if route was hit to simply update read statuses. 
     if (readMessages) {
         readMessages.forEach(message => {
             handleMessage(message)
