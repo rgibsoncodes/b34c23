@@ -149,21 +149,21 @@ const Home = ({ user, logout }) => {
     );
   }, []);
 
-  const setMessagesToRead = useCallback((id) => {
+  const setMessagesToRead = useCallback((updateMessageObject) => {
+    const { unreadMessages, conversationId } = updateMessageObject;
+    const messagesArray = [];
     try {
-      const body = {
-        conversationId: id,
-        readMessages: true,
-      }
-      saveMessage(body);
       setConversations((prev) =>
         prev.map((convo) => {
-          if (convo.id === id) {
+          if (convo.id === conversationId) {
             const convoCopy = { ...convo };
             const updatedMessages = [...convoCopy.messages]
-            updatedMessages.forEach(message => {
-                message.read = true;
-            });
+            const startIndex = updatedMessages.length - unreadMessages;
+            console.log(updatedMessages, startIndex)
+            for (let i = startIndex; i < updatedMessages.length; i++) {
+                updatedMessages[i].read = true;
+                messagesArray.push(updatedMessages[i].id);
+            }
             convoCopy.messages = [...updatedMessages];
             return convoCopy;
           } else {
@@ -171,6 +171,7 @@ const Home = ({ user, logout }) => {
           }
         })
       );
+      saveMessage({readMessages: messagesArray});
 
     } catch (error) {
       console.error(error);

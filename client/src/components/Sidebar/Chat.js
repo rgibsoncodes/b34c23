@@ -18,18 +18,28 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Chat = ({ conversation, setActiveChat, setMessagesToRead }) => {
+const Chat = ({ conversation, setActiveChat, setMessagesToRead, user }) => {
   const classes = useStyles();
   const { otherUser } = conversation;
 
+  console.log(conversation)
   const unreadMessages = useMemo(() => {
-    return conversation.messages.filter(message => !message.read).length; 
-  }, [conversation])
+    for (let i = conversation.messages.length - 1; i >= 0; i--) {
+        if (conversation.messages[i].read === true || conversation.messages[i].senderId === user.id) {
+            return conversation.messages.length - (i + 1);
+        }
+    }
+    return conversation.messages.length;
+  }, [conversation, user])
 
   const handleClick = async (conversation) => {
     await setActiveChat(conversation.otherUser.username);
     if (unreadMessages > 0) {
-        setMessagesToRead(conversation.id);
+        const payload = {
+            unreadMessages: unreadMessages,
+            conversationId: conversation.id,
+        }
+        setMessagesToRead(payload);
     }
   };
 

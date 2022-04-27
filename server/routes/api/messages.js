@@ -4,11 +4,15 @@ const onlineUsers = require("../../onlineUsers");
 
 
 const handleMessage = async (messageId) => {
+  try {
     let databaseMessage = await Message.findMessage(messageId);
     databaseMessage.set({
         read: true,
     })
     await databaseMessage.save();
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 // expects {recipientId, text, conversationId } in body (conversationId will be null if no conversation exists yet)
@@ -19,14 +23,10 @@ router.post("/", async (req, res, next) => {
     }
     const senderId = req.user.id;
     const { recipientId, text, conversationId, sender, readMessages } = req.body;
-
+    
     if (readMessages) {
-        let conversation = await Conversation.findOne({where: {id: conversationId}})
-        console.log(conversation, conversationId)
-        conversation.messages.forEach(message => {
-            if (!message.read) {
-                handleMessage(message.id)
-            }
+        readMessages.forEach(message => {
+            handleMessage(message)
         })
         return res.sendStatus(200);
     }

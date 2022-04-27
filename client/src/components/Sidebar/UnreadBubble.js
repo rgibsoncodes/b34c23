@@ -21,6 +21,7 @@ const UnreadBubble = (props) => {
     const classes = useStyles();
     const { unreadMessages = 0 } = props;
 
+    console.log(props)
     return ( unreadMessages !== 0  &&
       (
         <div className={classes.unreadBubble}>
