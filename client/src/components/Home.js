@@ -62,16 +62,14 @@ const Home = ({ user, logout }) => {
     });
   };
 
-  const postMessage = (body) => {
+  const postMessage = async (body) => {
     try {
-      const data = saveMessage(body);
-
+      const data = await saveMessage(body);
       if (!body.conversationId) {
         addNewConvo(body.recipientId, data.message);
       } else {
         addMessageToConversation(data);
       }
-
       sendMessage(data, body);
     } catch (error) {
       console.error(error);
@@ -80,14 +78,23 @@ const Home = ({ user, logout }) => {
 
   const addNewConvo = useCallback(
     (recipientId, message) => {
-      conversations.forEach((convo) => {
+      let newConversations = [...conversations];
+      let newestChatIndex;
+
+      newConversations.forEach((convo, index) => {
         if (convo.otherUser.id === recipientId) {
-          convo.messages.push(message);
+          newestChatIndex = index;
+          const messagesCopy = [...convo.messages, message];
+          convo.messages = [...messagesCopy];
           convo.latestMessageText = message.text;
           convo.id = message.conversationId;
         }
       });
-      setConversations(conversations);
+
+      const firstChat = newConversations[newestChatIndex];
+      newConversations.splice(newestChatIndex, 1)
+      
+      setConversations(() => [firstChat, ...newConversations]);
     },
     [setConversations, conversations]
   );
@@ -106,13 +113,22 @@ const Home = ({ user, logout }) => {
         setConversations((prev) => [newConvo, ...prev]);
       }
 
-      conversations.forEach((convo) => {
+      let newConversations = [...conversations];
+      let newestChatIndex;
+
+      newConversations.forEach((convo, index) => {
         if (convo.id === message.conversationId) {
-          convo.messages.push(message);
+          newestChatIndex = index;
+          const messagesCopy = [...convo.messages, message];
+          convo.messages = [...messagesCopy];
           convo.latestMessageText = message.text;
         }
       });
-      setConversations(conversations);
+
+      const firstChat = newConversations[newestChatIndex];
+      newConversations.splice(newestChatIndex, 1)
+      
+      setConversations(() => [firstChat, ...newConversations]);
     },
     [setConversations, conversations]
   );
