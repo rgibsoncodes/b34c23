@@ -103,6 +103,7 @@ const Home = ({ user, logout }) => {
     (data) => {
       // if sender isn't null, that means the message needs to be put in a brand new convo
       const { message, sender = null } = data;
+      if (message.senderId === activeConversation.id) message.read = true;
       if (sender !== null) {
         const newConvo = {
           id: message.conversationId,
@@ -130,11 +131,11 @@ const Home = ({ user, logout }) => {
       
       setConversations(() => [firstChat, ...newConversations]);
     },
-    [setConversations, conversations]
+    [setConversations, conversations, activeConversation]
   );
 
-  const setActiveChat = (username) => {
-    setActiveConversation(username);
+  const setActiveChat = (user) => {
+    setActiveConversation(user);
   };
 
   const addOnlineUser = useCallback((id) => {
@@ -168,7 +169,7 @@ const Home = ({ user, logout }) => {
   // Function hits backend to update messages in database and immediately updates front-end. 
   const setMessagesToRead = useCallback((updateMessageObject) => {
     const { unreadMessages, conversationId } = updateMessageObject;
-    const messagesArray = [];
+    let firstUnreadMessage;
     try {
       setConversations((prev) =>
         prev.map((convo) => {
@@ -176,10 +177,10 @@ const Home = ({ user, logout }) => {
             const convoCopy = { ...convo };
             const updatedMessages = [...convoCopy.messages]
             const startIndex = updatedMessages.length - unreadMessages;
-
+            firstUnreadMessage = updatedMessages[startIndex];
+            
             for (let i = startIndex; i < updatedMessages.length; i++) {
                 updatedMessages[i].read = true;
-                messagesArray.push(updatedMessages[i].id);
             }
 
             convoCopy.messages = [...updatedMessages];
@@ -189,12 +190,15 @@ const Home = ({ user, logout }) => {
           }
         })
       );
-      saveMessage({readMessages: messagesArray});
+      
+      const body = { firstUnreadMessage: firstUnreadMessage }
+      axios.put('/api/messages', body);
 
     } catch (error) {
       console.error(error);
     }
   }, [setConversations])
+
 
   // Lifecycle
 
@@ -203,10 +207,13 @@ const Home = ({ user, logout }) => {
     socket.on('add-online-user', addOnlineUser);
     socket.on('remove-offline-user', removeOfflineUser);
     socket.on('new-message', addMessageToConversation);
+    // socket.on('read-messages', updateReadMessages);
+
 
     return () => {
       // before the component is destroyed
       // unbind all event handlers used in this component
+    //   socket.off('read-messages', updateReadMessages);
       socket.off('add-online-user', addOnlineUser);
       socket.off('remove-offline-user', removeOfflineUser);
       socket.off('new-message', addMessageToConversation);

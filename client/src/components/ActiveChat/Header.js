@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   username: {
     fontSize: 20,
     letterSpacing: -0.29,
-    fontWeight: 'bold',
+    fontWeight: 600,
     marginRight: 14,
   },
   statusText: {

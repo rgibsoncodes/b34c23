@@ -26,10 +26,11 @@ const ActiveChat = ({
   postMessage,
 }) => {
   const classes = useStyles();
+  const username = activeConversation ? activeConversation.username : null;
 
   const conversation = conversations
     ? conversations.find(
-        (conversation) => conversation.otherUser.username === activeConversation
+        (conversation) => conversation.otherUser.username === username
       )
     : {};
 

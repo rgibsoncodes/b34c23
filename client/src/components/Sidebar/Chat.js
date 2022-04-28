@@ -30,10 +30,10 @@ const Chat = ({ conversation, setActiveChat, setMessagesToRead, user }) => {
         }
     }
     return conversation.messages.length;
-  }, [conversation, user])
+  }, [conversation.messages, user])
 
   const handleClick = async (conversation) => {
-    await setActiveChat(conversation.otherUser.username);
+    await setActiveChat(conversation.otherUser);
     if (unreadMessages > 0) {
         const payload = {
             unreadMessages: unreadMessages,
@@ -51,7 +51,7 @@ const Chat = ({ conversation, setActiveChat, setMessagesToRead, user }) => {
         online={otherUser.online}
         sidebar={true}
       />
-      <ChatContent conversation={conversation} />
+      <ChatContent isBold={unreadMessages ? true : false} conversation={conversation} />
       <UnreadBubble unreadMessages={unreadMessages}/>
     </Box>
   );

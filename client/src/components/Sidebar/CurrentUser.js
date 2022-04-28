@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
   username: {
     letterSpacing: -0.23,
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 600,
     marginLeft: 17,
   },
   ellipsis: {

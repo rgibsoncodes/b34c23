@@ -1,9 +1,11 @@
 const router = require("express").Router();
 const { Conversation, Message } = require("../../db/models");
 const onlineUsers = require("../../onlineUsers");
+const { Op } = require("sequelize");
 
 
-// Async function to upadte read value of message.
+
+// Async function to update read value of message.
 const handleMessage = async (messageId) => {
   try {
     const databaseMessage = await Message.findMessage(messageId);
@@ -23,15 +25,8 @@ router.post("/", async (req, res, next) => {
       return res.sendStatus(401);
     }
     const senderId = req.user.id;
-    const { recipientId, text, conversationId, sender, readMessages } = req.body;
+    const { recipientId, text, conversationId, sender} = req.body;
 
-    // checks if route was hit to simply update read statuses. 
-    if (readMessages) {
-        readMessages.forEach(message => {
-            handleMessage(message)
-        })
-        return res.sendStatus(200);
-    }
     // if we already know conversation id, we can save time and just add it to message and return
     if (conversationId) {
       const message = await Message.create({ senderId, text, conversationId });
@@ -62,6 +57,27 @@ router.post("/", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+router.put('/', async (req, res, next) => {
+    try {
+      const { firstUnreadMessage } = req.body;
+      // checks if route was hit to simply update read statuses. 
+      const messages = await Message.update(
+        { read: true},
+        { where: 
+          {
+            conversationId: firstUnreadMessage.conversationId, 
+            createdAt: {
+              [Op.gte]: firstUnreadMessage.createdAt
+            } 
+          },
+        }
+      )
+      return res.sendStatus(204);
+    } catch(error) {
+      next(error)
+    }
 });
 
 module.exports = router;

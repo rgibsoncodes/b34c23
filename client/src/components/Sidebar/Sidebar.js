@@ -12,7 +12,7 @@ const useStyles = makeStyles(() => ({
   title: {
     fontSize: 20,
     letterSpacing: -0.29,
-    fontWeight: 'bold',
+    fontWeight: 600,
     marginTop: 32,
     marginBottom: 15,
   },
