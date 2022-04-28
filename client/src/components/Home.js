@@ -207,13 +207,10 @@ const Home = ({ user, logout }) => {
     socket.on('add-online-user', addOnlineUser);
     socket.on('remove-offline-user', removeOfflineUser);
     socket.on('new-message', addMessageToConversation);
-    // socket.on('read-messages', updateReadMessages);
-
 
     return () => {
       // before the component is destroyed
       // unbind all event handlers used in this component
-    //   socket.off('read-messages', updateReadMessages);
       socket.off('add-online-user', addOnlineUser);
       socket.off('remove-offline-user', removeOfflineUser);
       socket.off('new-message', addMessageToConversation);
