@@ -22,7 +22,7 @@ const Chat = ({ conversation, setActiveChat, countUnreadMessages }) => {
   const classes = useStyles();
   const { otherUser } = conversation;
 
-  const unreadMessages = countUnreadMessages(conversation.messages);
+  const unreadMessages = countUnreadMessages(conversation.messages, conversation.otherUser.id);
 
   const handleClick = async (conversation) => {
     await setActiveChat(conversation.otherUser);

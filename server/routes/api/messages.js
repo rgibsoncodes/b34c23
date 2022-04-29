@@ -5,19 +5,6 @@ const { Op } = require("sequelize");
 
 
 
-// Async function to update read value of message.
-const handleMessage = async (messageId) => {
-  try {
-    const databaseMessage = await Message.findMessage(messageId);
-    databaseMessage.set({
-        read: true,
-    })
-    await databaseMessage.save();
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 // expects {recipientId, text, conversationId } in body (conversationId will be null if no conversation exists yet)
 router.post("/", async (req, res, next) => {
   try {
@@ -61,16 +48,14 @@ router.post("/", async (req, res, next) => {
 
 router.put('/', async (req, res, next) => {
     try {
-      const { firstUnreadMessage } = req.body;
-      console.log(req.body)
-      // checks if route was hit to simply update read statuses. 
+      const { lastReadMessage } = req.body;
       const messages = await Message.update(
         { read: true},
         { where: 
           {
-            conversationId: firstUnreadMessage.conversationId, 
+            conversationId: lastReadMessage.conversationId, 
             createdAt: {
-              [Op.gte]: firstUnreadMessage.createdAt
+              [Op.gte]: lastReadMessage.createdAt
             } 
           },
         }

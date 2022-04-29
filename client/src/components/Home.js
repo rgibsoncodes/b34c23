@@ -62,35 +62,6 @@ const Home = ({ user, logout }) => {
     });
   };
 
-  const sendReadMessage = (data) => {
-      console.log("socker emitted a ton of times")
-    socket.emit('read-message', {
-        otherUserId: data.otherUserId,
-        lastReadMessage: data.lastReadMessage,
-    })
-  }
-
-  const countUnreadMessages = useCallback((messagesArr) => {
-    for (let i = messagesArr.length - 1; i >= 0; i--) {
-        if (messagesArr[i].read === true || messagesArr[i].senderId === user.id) {
-            return messagesArr.length - (i + 1);
-        }
-    }
-    return messagesArr.length;
-  }, [user])
-
-  const readMessage = (messagesArr) => {
-      console.log(10000987)
-    const unreadMessages = countUnreadMessages(messagesArr);
-    const data = {
-        unreadMessages: unreadMessages, 
-        conversationId: messagesArr[0].conversationId, 
-        lastReadMessage: messagesArr[messagesArr.length - unreadMessages],
-    }
-    sendReadMessage(data);
-    setMessagesToRead(data);
-  }
-
   const postMessage = async (body) => {
     try {
       const data = await saveMessage(body);
@@ -122,7 +93,7 @@ const Home = ({ user, logout }) => {
 
       const firstChat = newConversations[newestChatIndex];
       newConversations.splice(newestChatIndex, 1)
-      
+
       setConversations(() => [firstChat, ...newConversations]);
     },
     [setConversations, conversations]
@@ -132,9 +103,6 @@ const Home = ({ user, logout }) => {
     (data) => {
       // if sender isn't null, that means the message needs to be put in a brand new convo
       const { message, sender = null } = data;
-    //   if (activeConversation && message.senderId === activeConversation.id) {
-    //       message.read = true;
-    //   }
       if (sender !== null) {
         const newConvo = {
           id: message.conversationId,
@@ -144,22 +112,19 @@ const Home = ({ user, logout }) => {
         newConvo.latestMessageText = message.text;
         setConversations((prev) => [newConvo, ...prev]);
       } else {
-          let newConversations = [...conversations];
-          let newestChatIndex;
-    
-          newConversations.forEach((convo, index) => {
-            if (convo.id === message.conversationId) {
-              newestChatIndex = index;
-              const messagesCopy = [...convo.messages, message];
-              convo.messages = [...messagesCopy];
-              convo.latestMessageText = message.text;
-            }
-          });
-    
-          const firstChat = newConversations[newestChatIndex];
-          newConversations.splice(newestChatIndex, 1)
-          
-          setConversations(() => [firstChat, ...newConversations]);
+        let newConversations = [...conversations];
+        let newestChatIndex;
+        newConversations.forEach((convo, index) => {
+          if (convo.id === message.conversationId) {
+            newestChatIndex = index;
+            const messagesCopy = [...convo.messages, message];
+            convo.messages = [...messagesCopy];
+            convo.latestMessageText = message.text;
+          }
+        });
+        const firstChat = newConversations[newestChatIndex];
+        newConversations.splice(newestChatIndex, 1)
+        setConversations(() => [firstChat, ...newConversations]);
       }
 
     },
@@ -199,41 +164,41 @@ const Home = ({ user, logout }) => {
     );
   }, []);
 
-  // Function hits backend to update messages in database and immediately updates front-end. 
-  const setMessagesToRead = useCallback((updateMessageObject) => {
-      const { unreadMessages, conversationId, lastReadMessage } = updateMessageObject;
-      console.log("called set messages to read with", lastReadMessage)
-    try {
-      setConversations((prev) =>
-        prev.map((convo) => {
-          if (convo.id === conversationId) {
-            const convoCopy = { ...convo };
-            const updatedMessages = [...convoCopy.messages]
-            const startIndex = updatedMessages.length - unreadMessages;
-            for (let i = startIndex; i < updatedMessages.length; i++) {
-                updatedMessages[i].read = true;
-            }
 
-            convoCopy.messages = [...updatedMessages];
-            return convoCopy;
-          } else {
-            return convo;
-          }
-        })
-      );
-      
-      const body = { firstUnreadMessage: lastReadMessage }
-      axios.put('/api/messages', body);
+  //------------Read Messages Functionality----------------
 
-    } catch (error) {
-      console.error(error);
+
+  const sendReadMessage = (lastReadMessage) => {
+    socket.emit('read-message', {
+        lastReadMessage: lastReadMessage,
+    })
+  }
+
+  const countUnreadMessages = useCallback((messagesArr, otherUserId) => {
+    if (otherUserId && activeConversation && otherUserId === activeConversation.id) return 0;  
+    for (let i = messagesArr.length - 1; i >= 0; i--) {
+        if (messagesArr[i].read === true || messagesArr[i].senderId === user.id) {
+            return messagesArr.length - (i + 1);
+        }
     }
-  }, [setConversations])
+    return messagesArr.length;
+  }, [user, activeConversation])
 
+  const readMessage = (messagesArr) => {
+    const unreadMessages = countUnreadMessages(messagesArr);
+    const lastReadMessage = messagesArr[messagesArr.length - unreadMessages];
+    sendReadMessage(lastReadMessage);
+    updateReadMessages({ lastReadMessage: lastReadMessage });
+    const body = { lastReadMessage: lastReadMessage }
+    try {
+        axios.put('/api/messages', body);
+    } catch(err) {
+        console.error(err)
+    }
+  }
 
   const updateReadMessages = useCallback((data) => {
       const { lastReadMessage } = data;
-      console.log("called update messages", lastReadMessage)
       setConversations((prev) =>
       prev.map((convo) => {
         if (convo.id === lastReadMessage.conversationId) {
@@ -241,12 +206,8 @@ const Home = ({ user, logout }) => {
           const updatedMessages = [...convoCopy.messages]
           const startIndex = updatedMessages.findIndex((message) => message.id === lastReadMessage.id);
           for (let i = startIndex; i < updatedMessages.length; i++) {
-            //   if (updatedMessages[i].senderId === user.id) {
-            //       break;
-            //   }
               updatedMessages[i].read = true;
           }
-
           convoCopy.messages = [...updatedMessages];
           return convoCopy;
         } else {
@@ -273,7 +234,7 @@ const Home = ({ user, logout }) => {
       socket.off('new-message', addMessageToConversation);
       socket.off('read-message', updateReadMessages);
     };
-  }, [addMessageToConversation, addOnlineUser, removeOfflineUser, socket]);
+  }, [addMessageToConversation, addOnlineUser, removeOfflineUser, updateReadMessages, socket]);
 
   useEffect(() => {
     // when fetching, prevent redirect
@@ -308,7 +269,6 @@ const Home = ({ user, logout }) => {
     }
   };
 
-  console.log(conversations)
   return (
     <>
       <Button onClick={handleLogout}>Logout</Button>
@@ -320,7 +280,6 @@ const Home = ({ user, logout }) => {
           clearSearchedUsers={clearSearchedUsers}
           addSearchedUsers={addSearchedUsers}
           setActiveChat={setActiveChat}
-          setMessagesToRead={setMessagesToRead}
           countUnreadMessages={countUnreadMessages}
         />
         <ActiveChat
