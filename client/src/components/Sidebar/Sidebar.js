@@ -12,7 +12,7 @@ const useStyles = makeStyles(() => ({
   title: {
     fontSize: 20,
     letterSpacing: -0.29,
-    fontWeight: 'bold',
+    fontWeight: 600,
     marginTop: 32,
     marginBottom: 15,
   },
@@ -24,6 +24,7 @@ const Sidebar = ({
   conversations = [],
   user,
   setActiveChat,
+  countUnreadMessages,
 }) => {
   const classes = useStyles();
   return (
@@ -41,6 +42,8 @@ const Sidebar = ({
               conversation={conversation}
               key={conversation.otherUser.username}
               setActiveChat={setActiveChat}
+              countUnreadMessages={countUnreadMessages}
+              user={user}
             />
           );
         })}

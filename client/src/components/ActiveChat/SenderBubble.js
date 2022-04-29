@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography, Avatar } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -11,7 +11,7 @@ const useStyles = makeStyles(() => ({
   date: {
     fontSize: 11,
     color: '#BECCE2',
-    fontWeight: 'bold',
+    fontWeight: 600,
     marginBottom: 5,
   },
   text: {
@@ -19,15 +19,20 @@ const useStyles = makeStyles(() => ({
     color: '#91A3C0',
     letterSpacing: -0.2,
     padding: 8,
-    fontWeight: 'bold',
+    fontWeight: 600,
   },
   bubble: {
     background: '#F4F6FA',
     borderRadius: '10px 10px 0 10px',
   },
+  avatar: {
+    height: 20,
+    width: 20,
+    marginTop: 6,
+  },
 }));
 
-const SenderBubble = ({ time, text }) => {
+const SenderBubble = ({ time, text, otherUser, withAvatar }) => {
   const classes = useStyles();
 
   return (
@@ -36,6 +41,13 @@ const SenderBubble = ({ time, text }) => {
       <Box className={classes.bubble}>
         <Typography className={classes.text}>{text}</Typography>
       </Box>
+      { withAvatar && (     
+        <Avatar
+            alt={otherUser.username}
+            src={otherUser.photoUrl}
+            className={classes.avatar}
+        /> 
+      )}
     </Box>
   );
 };

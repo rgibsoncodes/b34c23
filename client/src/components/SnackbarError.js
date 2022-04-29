@@ -6,7 +6,7 @@ import Close from "@material-ui/icons/Close";
 const useStyles = makeStyles((theme) => ({
   snackbar: {
     backgroundColor: "red",
-    fontWeight: "bold",
+    fontWeight: 600,
   },
   icon: {
     color: "white",

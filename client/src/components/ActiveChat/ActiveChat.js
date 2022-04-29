@@ -24,19 +24,20 @@ const ActiveChat = ({
   conversations,
   activeConversation,
   postMessage,
-}) => {
+  readMessage,
+}) => {  
   const classes = useStyles();
-
-  const conversation = conversations
-    ? conversations.find(
-        (conversation) => conversation.otherUser.username === activeConversation
-      )
-    : {};
-
+    
+  const username = activeConversation ? activeConversation.username : null;
+  
+  const conversation = conversations ? conversations.find(
+      (conversation) => conversation.otherUser.username === username)
+  : {};
+  
   const isConversation = (obj) => {
     return obj !== {} && obj !== undefined;
   };
-
+          
   return (
     <Box className={classes.root}>
       {isConversation(conversation) && conversation.otherUser && (
@@ -52,6 +53,7 @@ const ActiveChat = ({
                   messages={conversation.messages}
                   otherUser={conversation.otherUser}
                   userId={user.id}
+                  readMessage={readMessage}
                 />
                 <Input
                   otherUser={conversation.otherUser}

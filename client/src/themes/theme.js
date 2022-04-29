@@ -7,13 +7,13 @@ export const theme = createMuiTheme({
     button: {
       textTransform: "none",
       letterSpacing: 0,
-      fontWeight: "bold"
+      fontWeight: 600,
     }
   },
   overrides: {
     MuiInput: {
       input: {
-        fontWeight: "bold"
+        fontWeight: 600,
       }
     }
   },

@@ -54,6 +54,12 @@ io.on("connection", (socket) => {
       socket.broadcast.emit("remove-offline-user", id);
     }
   });
+
+  socket.on("read-message", (data) => {
+    socket.broadcast.emit("read-message", {
+      lastReadMessage: data.lastReadMessage,
+    });
+  });
 });
 
 sessionStore

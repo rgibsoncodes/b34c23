@@ -2,6 +2,7 @@ import React from 'react';
 import { Box } from '@material-ui/core';
 import { BadgeAvatar, ChatContent } from '../Sidebar';
 import { makeStyles } from '@material-ui/core/styles';
+import UnreadBubble from './UnreadBubble';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -17,12 +18,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Chat = ({ conversation, setActiveChat }) => {
+const Chat = ({ conversation, setActiveChat, countUnreadMessages }) => {
   const classes = useStyles();
   const { otherUser } = conversation;
 
+  const unreadMessages = countUnreadMessages(conversation.messages, conversation.otherUser.id);
+
   const handleClick = async (conversation) => {
-    await setActiveChat(conversation.otherUser.username);
+    await setActiveChat(conversation.otherUser);
   };
 
   return (
@@ -33,7 +36,8 @@ const Chat = ({ conversation, setActiveChat }) => {
         online={otherUser.online}
         sidebar={true}
       />
-      <ChatContent conversation={conversation} />
+      <ChatContent isBold={unreadMessages ? true : false} conversation={conversation} />
+      <UnreadBubble unreadMessages={unreadMessages}/>
     </Box>
   );
 };

@@ -9,7 +9,7 @@ const useStyles = makeStyles(() => ({
     background: "#E9EEF9",
     borderRadius: 5,
     fontSize: 13,
-    fontWeight: "bold",
+    fontWeight: 600,
     color: "#99A9C4",
     letterSpacing: 0,
     display: "flex",

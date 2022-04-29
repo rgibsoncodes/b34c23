@@ -15,7 +15,7 @@ const useStyles = makeStyles(() => ({
   usernameDate: {
     fontSize: 11,
     color: '#BECCE2',
-    fontWeight: 'bold',
+    fontWeight: 600,
     marginBottom: 5,
   },
   bubble: {
@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
   },
   text: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: 600,
     color: '#FFFFFF',
     letterSpacing: -0.2,
     padding: 8,
