@@ -5,7 +5,7 @@ import moment from 'moment';
 
 const Messages = (props) => {
   const { messages, otherUser, userId, readMessage } = props;
-  
+
   // finds the id of the message that needs avatar. 
   const lastUnreadMessageId = useMemo(() => {
   for (let i = messages.length - 1; i >= 0; i--) {
@@ -17,9 +17,11 @@ const Messages = (props) => {
   }, [messages, otherUser])
 
   useEffect(() => {
-    const latest = messages[messages.length - 1];
-    if (latest.senderId === otherUser.id && latest.read !== true) {
-        readMessage(messages);
+    if (messages.length > 0) {
+        const latest = messages[messages.length - 1];
+        if (latest.senderId === otherUser.id && latest.read !== true) {
+            readMessage(messages);
+        }
     }
   }, [lastUnreadMessageId, messages, readMessage, otherUser.id])
 
