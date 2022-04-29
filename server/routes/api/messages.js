@@ -62,6 +62,7 @@ router.post("/", async (req, res, next) => {
 router.put('/', async (req, res, next) => {
     try {
       const { firstUnreadMessage } = req.body;
+      console.log(req.body)
       // checks if route was hit to simply update read statuses. 
       const messages = await Message.update(
         { read: true},

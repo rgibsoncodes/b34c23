@@ -18,29 +18,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Chat = ({ conversation, setActiveChat, setMessagesToRead, user }) => {
+const Chat = ({ conversation, setActiveChat, countUnreadMessages }) => {
   const classes = useStyles();
   const { otherUser } = conversation;
 
-  // Calculates the amount of unread messages by either hitting a true value or the other users message.
-  const unreadMessages = useMemo(() => {
-    for (let i = conversation.messages.length - 1; i >= 0; i--) {
-        if (conversation.messages[i].read === true || conversation.messages[i].senderId === user.id) {
-            return conversation.messages.length - (i + 1);
-        }
-    }
-    return conversation.messages.length;
-  }, [conversation.messages, user])
+  const unreadMessages = countUnreadMessages(conversation.messages);
 
   const handleClick = async (conversation) => {
     await setActiveChat(conversation.otherUser);
-    if (unreadMessages > 0) {
-        const payload = {
-            unreadMessages: unreadMessages,
-            conversationId: conversation.id,
-        }
-        setMessagesToRead(payload);
-    }
   };
 
   return (
