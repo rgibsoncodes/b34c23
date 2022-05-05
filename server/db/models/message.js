@@ -11,17 +11,25 @@ const Message = db.define("message", {
     allowNull: false,
   },
   read: {
-      type: Sequelize.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
+    type: Sequelize.STRING,
+    allowNull: false,
+    get() {
+        return this.getDataValue('read').split(';')
+    },
+    set(value) {
+       value = [`${value}`];
+       this.setDataValue('read', value.join(';'));
+    },
+    defaultValue: "",
   }
 });
 
-Message.findMessage = async function (messageId) {
-    const message = await Message.findOne({ where: { id: messageId }});
-  
-    // return message or null if it doesn't exist
-    return message;
-};
+// Function became unnecessary
+
+// Message.findMessage = async function (messageId) {
+//     const message = await Message.findOne({ where: { id: messageId }});
+//     // return message or null if it doesn't exist
+//     return message;
+// };
 
 module.exports = Message;
