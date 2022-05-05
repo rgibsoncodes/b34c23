@@ -4,11 +4,8 @@ const Message = require("./message");
 const GroupMember = require("./groupMember");
 
 // associations
-
-User.hasMany(GroupMember);
-GroupMember.belongsTo(User)
-Conversation.hasMany(GroupMember);
-GroupMember.belongsTo(Conversation)
+User.belongsToMany(Conversation, { through: GroupMember });
+Conversation.belongsToMany(User, { through: GroupMember });
 Message.belongsTo(Conversation);
 Conversation.hasMany(Message);
 
